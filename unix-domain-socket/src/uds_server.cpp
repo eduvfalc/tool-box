@@ -17,7 +17,7 @@ UDSServer::UDSServer() {
     if (-1  == flags) {
         helper::Error("could not read socket flags");
     }
-    // helper::Guard(fcntl(m_server_file_descriptor, F_SETFL, flags | O_NONBLOCK), "could not set socket as non-blocking");
+    helper::Guard(fcntl(m_server_file_descriptor, F_SETFL, flags | O_NONBLOCK), "could not set socket as non-blocking");
     memset(&m_socket_address, 0, sizeof(sockaddr_un));
     m_socket_address.sun_family = AF_UNIX;
     strncpy(m_socket_address.sun_path, SV_SOCK_PATH, sizeof(m_socket_address.sun_path) - 1);
