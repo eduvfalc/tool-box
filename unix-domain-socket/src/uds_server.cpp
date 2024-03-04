@@ -48,8 +48,8 @@ UDSServer::Run() {
         auto client_file_descriptor = accept(m_server_file_descriptor, NULL, NULL);
         if (-1 == client_file_descriptor) {
             if (errno == EWOULDBLOCK) {
-                // put some delay otherwise CPU load will be high
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                // put some delay otherwise CPU load will be high when server is idle
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
             else {
                 helper::Error("unable to accept client request");
