@@ -5,6 +5,6 @@
 int main () {
     std::shared_ptr<toolbox::uds::UDSClient> client = std::make_shared<toolbox::uds::UDSClient>();
     if (!client->Connect()) std::cout << "unable to connect" << std::endl;
-    client->Start();
+    client->Send();
     return 0;
 }

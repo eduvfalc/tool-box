@@ -19,7 +19,7 @@ UDSClient::Connect() {
 }
 
 void
-UDSClient::Start() {
+UDSClient::Send() {
     ssize_t num_read;
     while ((num_read = read(STDIN_FILENO, m_buffer, BUF_SIZE)) > 0)
         if (write(m_server_file_descriptor, m_buffer, num_read) != num_read)
