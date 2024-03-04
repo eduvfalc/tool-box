@@ -9,7 +9,5 @@ int main () {
     if (!server->Bind()) std::cout << "unable to bind" << std::endl;
     if (!server->Listen()) std::cout << "unable to listen" << std::endl;
     server->Start();
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-    server->Stop();
     return 0;
 }
