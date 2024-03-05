@@ -16,6 +16,5 @@ echo "this content should be in both files" >> in_file
 ./uds-server > out_file &
 sleep 0.1
 ./uds-client < in_file
-sleep 0.1
 
-kill %1
+wait
