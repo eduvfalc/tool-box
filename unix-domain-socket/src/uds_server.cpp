@@ -8,9 +8,9 @@
 
 using namespace toolbox::uds;
 
-UDSServer::UDSServer() {
+UDSServer::UDSServer() : m_buffer(BUF_SIZE) {
     m_server_file_descriptor = helper::Guard(socket(AF_UNIX, SOCK_STREAM, 0), "could not create server socket");
-    if (remove(SV_SOCK_PATH) == -1 && errno != ENOENT) {
+    if (remove(SV_SOCK_PATH.c_str()) == -1 && errno != ENOENT) {
         helper::Error("could not remove socket");
     }
     auto flags = fcntl(m_server_file_descriptor, F_GETFL);
@@ -20,7 +20,7 @@ UDSServer::UDSServer() {
     helper::Guard(fcntl(m_server_file_descriptor, F_SETFL, flags | O_NONBLOCK), "could not set socket as non-blocking");
     memset(&m_socket_address, 0, sizeof(sockaddr_un));
     m_socket_address.sun_family = AF_UNIX;
-    strncpy(m_socket_address.sun_path, SV_SOCK_PATH, sizeof(m_socket_address.sun_path) - 1);
+    strncpy(m_socket_address.sun_path, SV_SOCK_PATH.c_str(), sizeof(m_socket_address.sun_path) - 1);
 }
 
 bool
@@ -56,8 +56,8 @@ UDSServer::Run() {
             }
         }
         else {
-            while ((num_read = read(client_file_descriptor, m_buffer, BUF_SIZE)) > 0) {
-                if (write(STDOUT_FILENO, m_buffer, num_read) != num_read) {
+            while ((num_read = read(client_file_descriptor, m_buffer.data(), m_buffer.size())) > 0) {
+                if (write(STDOUT_FILENO, m_buffer.data(), num_read) != num_read) {
                     helper::Error("partial/failed write");
                 }
             }
