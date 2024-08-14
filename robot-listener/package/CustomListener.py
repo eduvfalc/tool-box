@@ -13,16 +13,15 @@ class CustomListener:
         mkdir(self.suite_dir)
 
     def start_test(self, data, result):
-        self.test_name = data.name 
-        self.test_dir = path.join(path.dirname(__file__), "../output/" + self.suite_name + "/" + self.test_name)
+        self.test_dir = path.join(path.dirname(__file__), "../output/" + self.suite_name + "/" + data.name)
         if (path.exists(self.test_dir)):
             rmdir(self.test_dir)
         mkdir(self.test_dir)
     
     def end_suite(self, data, result):
-        with open(self.suite_dir + "/" + self.suite_name, 'w') as json_file:
+        with open(self.suite_dir + "/" + data.name, 'w') as json_file:
             json.dump(result.to_dict(), json_file, indent=4)
 
     def end_test(self, data, result):
-        with open(self.test_dir + "/" + self.test_name, 'w') as json_file:
+        with open(self.test_dir + "/" + data.name, 'w') as json_file:
             json.dump(result.to_dict(), json_file, indent=4)
