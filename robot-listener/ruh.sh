@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
-robot --listener $(pwd)/package/CustomListener.py \
+robot --console none \
+      --listener $(pwd)/package/CustomListener.py \
       --outputdir ./output/test-run/ \
-      ./tests/*.robot
+      --test "Call keywords with a varying number of arguments" \
+      ./tests/robot-cheat-sheet.robot

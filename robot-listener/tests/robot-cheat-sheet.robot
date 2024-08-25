@@ -14,7 +14,7 @@ ${ENVIRONMENT_VARIABLE}=    %{PATH=Default value}
 Call keywords with a varying number of arguments
     [Documentation]    This is a test documentation
     A keyword without arguments
-    A keyword with a required argument    Argument
+    A keyword with a required argument    Argument=${10}
     A keyword with a required argument    argument=Argument
     A keyword with an optional argument
     A keyword with an optional argument    Argument
@@ -194,7 +194,9 @@ A keyword without arguments
 
 A keyword with a required argument
     [Arguments]    ${argument}
+    Sleep    3s
     Log    Required argument: ${argument}
+    Fail
 
 A keyword with an optional argument
     [Arguments]    ${argument}=Default value
