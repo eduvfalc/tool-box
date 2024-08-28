@@ -7,8 +7,8 @@ import json
 class CustomListener:
     ROBOT_LISTENER_API_VERSION = 3
 
-    def __init__(self):
-        self.custom_logger = CustomLogger()
+    def __init__(self, overwite_keyword_logs:bool = False):
+        self.custom_logger = CustomLogger(overwite_keyword_logs)
 
     def start_suite(self, data, result):
         # create suite dir

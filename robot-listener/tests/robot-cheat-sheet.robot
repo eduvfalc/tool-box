@@ -196,7 +196,7 @@ A keyword with a required argument
     [Arguments]    ${argument}
     Sleep    3s
     Log    Required argument: ${argument}
-    Fail
+    Fail    msg=It failed
 
 A keyword with an optional argument
     [Arguments]    ${argument}=Default value
