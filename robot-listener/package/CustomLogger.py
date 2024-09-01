@@ -36,6 +36,7 @@ class CustomLogger:
         color = green if result.status == 'PASS' else red
         logger.console(':' * shutil.get_terminal_size().columns)
         logger.console(f'Test suite finished in {elapsed_time} seconds\n'
+                       f'{result.statistics.total} executed, {result.statistics.passed} passed, {result.statistics.failed} failed\n'
                        f'Result: {color}{italic}{result.status}{reset}')
 
     def user_keyword_start(self, data, implementation, result) -> None:
