@@ -1,8 +1,11 @@
 from os import path, mkdir, rmdir
 from CustomLogger import CustomLogger
-from Constants import *
+from CustomTypes import *
 import shutil
 import json
+
+# path to out folder
+PATH_TO_OUTPUT = "../out/"
 
 class CustomListener:
     ROBOT_LISTENER_API_VERSION = 3
@@ -13,13 +16,13 @@ class CustomListener:
     def start_suite(self, data, result):
         # create suite dir
         self.suite_name = data.name
-        self.suite_dir = path.join(path.dirname(__file__), "../output/" + self.suite_name)
+        self.suite_dir = path.join(path.dirname(__file__), PATH_TO_OUTPUT + self.suite_name)
         self.create_dir(self.suite_dir)
         self.custom_logger.suite_start(data, result)
 
     def start_test(self, data, result):
         # create test dir
-        self.test_dir = path.join(path.dirname(__file__), "../output/" + self.suite_name + "/" + data.name)
+        self.test_dir = path.join(path.dirname(__file__), PATH_TO_OUTPUT + self.suite_name + "/" + data.name)
         self.create_dir(self.test_dir)
         self.custom_logger.test_start(data, result)
     
@@ -34,10 +37,16 @@ class CustomListener:
         self.custom_logger.test_end(data, result)
 
     def start_user_keyword(self, data, implementation, result):
-        self.custom_logger.user_keyword_start(data, implementation, result)
+        self.custom_logger.keyword_start(data, implementation, result)
 
     def end_user_keyword(self, data, implementation, result):
-        self.custom_logger.user_keyword_end(data, implementation, result)
+        self.custom_logger.keyword_end(data, implementation, result)
+
+    def start_library_keyword(self, data, implementation, result):
+        self.custom_logger.keyword_start(data, implementation, result)
+
+    def end_library_keyword(self, data, implementation, result):
+        self.custom_logger.keyword_end(data, implementation, result)
 
     def create_dir(self, dir):
         if (path.exists(dir)):

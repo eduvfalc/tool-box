@@ -2,6 +2,5 @@
 
 robot --console quiet \
       --listener $(pwd)/package/CustomListener.py:true \
-      --outputdir ./output/test-run/ \
-      --test "Call keywords with a varying number of arguments" \
+      --outputdir ./out/test-run/ \
       ./tests/robot-cheat-sheet.robot
