@@ -25,6 +25,7 @@ Call keywords with a varying number of arguments
 
 *** Keywords ***
 A keyword without arguments
+    A keyword with a required argument    Argument=test
     Log    No arguments.
 
 A keyword with a required argument

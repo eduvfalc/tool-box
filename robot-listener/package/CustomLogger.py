@@ -24,9 +24,9 @@ class CustomLogger:
         color = Color.green if 'PASS' in result.status else Color.red
         print('=' * shutil.get_terminal_size().columns)
         print(f'Test suite finished in {elapsed_time} seconds\n'
-              f'{result.statistics.total} executed, '
-              f'{self._create_trace(Trace(color=Color.green.value, text=result.statistics.passed))} passed, '
-              f'{self._create_trace(Trace(color=Color.red.value, text=result.statistics.failed))} failed, '
+              f'{result.statistics.total} executed,'
+              f'{self._create_trace(Trace(color=Color.green.value, text=result.statistics.passed))} passed,'
+              f'{self._create_trace(Trace(color=Color.red.value, text=result.statistics.failed))} failed,'
               f'{result.statistics.skipped} skipped\n'
               f'Suite result: {self._create_trace(Trace(color=color.value, text=result.status))}')
 
@@ -47,7 +47,7 @@ class CustomLogger:
 
     def keyword_start(self, data, implementation, result) -> None:
         if 'NOT RUN' not in result.status:
-            print(self.keyword_lvl * '\t' + (f'{self._create_trace(Trace(label=Label.call.value))} ' if self.keyword_lvl else '') \
+            print(self.keyword_lvl * '\t' + (f'{self._create_trace(Trace(label=Label.call.value))}' if self.keyword_lvl else '') \
                                             + f'{self._create_trace(Trace(label=Label.busy.value, text=data.name))}')
             self.keyword_lvl += 1
 
@@ -64,4 +64,7 @@ class CustomLogger:
         return elapsed_time.total_seconds()
 
     def _create_trace(self, msg: Trace) -> str:
-        return f'{msg.label}{msg.color}{msg.text}{Color.reset.value}'
+        trace = ''
+        for item in msg:
+            trace += f'{str(item)} ' if item else str(item)
+        return f'{trace}{Color.reset.value}'
