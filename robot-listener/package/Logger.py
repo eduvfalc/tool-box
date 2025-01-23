@@ -1,13 +1,12 @@
 from datetime import datetime
 from robot.api import logger
-from CustomTypes import *
+from TraceTypes import *
 import shutil
 
-class CustomLogger:
-    def __init__(self, overwrite_keyword_logs: bool):
+class Logger:
+    def __init__(self):
         # to control the log indent for nested keyword calls
         self.keyword_lvl = 0
-        self.overwrite_kw_logs = overwrite_keyword_logs
         print(f'{self._create_trace(Trace(text="Robot Framework Pretty Logger"))}\n'
               f'{self._create_trace(Trace(text="Legend:"))} '
               f'{self._create_trace(Trace(label=Label.success.value, text="Pass"))} '
