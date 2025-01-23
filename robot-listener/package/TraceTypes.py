@@ -17,6 +17,7 @@ class Label(Enum):
     fail = '❌'
     busy = '⌛'
     log = '🤖'
+    sleep = '💤'
     call = '↪'
 
 class Trace(namedtuple('Trace', ['label', 'color', 'text', 'text_format'])):

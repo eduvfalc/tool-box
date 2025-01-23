@@ -1,12 +1,14 @@
 from datetime import datetime
 from robot.api import logger
 from TraceTypes import *
+from TraceBuilder import TraceBuilder
 import shutil
 
 class Logger:
     def __init__(self):
         # to control the log indent for nested keyword calls
         self.keyword_lvl = 0
+        self.trace_builder = TraceBuilder()
         print(f'{self._create_trace(Trace(text="Robot Framework Pretty Logger"))}\n'
               f'{self._create_trace(Trace(text="Legend:"))} '
               f'{self._create_trace(Trace(label=Label.success.value, text="Pass"))} '
@@ -28,7 +30,7 @@ class Logger:
               f'{self._create_trace(Trace(color=Color.green.value, text=result.statistics.passed))} passed,'
               f'{self._create_trace(Trace(color=Color.red.value, text=result.statistics.failed))} failed,'
               f' {result.statistics.skipped} skipped\n'
-              f'Suite result:{self._create_trace(Trace(color=color.value, text=result.status))}')
+              f'Suite result: {self._create_trace(Trace(color=color.value, text=result.status))}')
 
     def test_start(self, data, result) -> None:
         self.keyword_lvl = 0
@@ -47,8 +49,8 @@ class Logger:
 
     def keyword_start(self, data, implementation, result) -> None:
         if 'NOT RUN' not in result.status:
-            print(self.keyword_lvl * '\t' + (f'{self._create_trace(Trace(label=Label.call.value))}' if self.keyword_lvl else '') \
-                                            + f'{self._create_trace(Trace(label=Label.busy.value, text=data.name))}')
+            print(self.keyword_lvl * '\t' + (f'{self._create_trace(Trace(label=Label.call.value))} ' if self.keyword_lvl else '') \
+                                            + f'{self._create_trace(self.trace_builder.build_trace(data, implementation))}')
             self.keyword_lvl += 1
 
     def keyword_end(self, data, implementation, result) -> None:
@@ -66,5 +68,5 @@ class Logger:
     def _create_trace(self, msg: Trace) -> str:
         trace = ''
         for item in msg:
-            trace += f'{str(item)} ' if item else str(item)
-        return trace + TextFormat.clear.value
+            trace += f'{str(item)} ' if item is not '' else ''
+        return trace[:-1] + TextFormat.clear.value
