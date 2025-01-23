@@ -5,6 +5,7 @@ import shutil
 
 class CustomLogger:
     def __init__(self, overwrite_keyword_logs: bool):
+        # to control the log indent for nested keyword calls
         self.keyword_lvl = 0
         self.overwrite_kw_logs = overwrite_keyword_logs
         print(f'{self._create_trace(Trace(text="Robot Framework Pretty Logger"))}\n'
@@ -27,8 +28,8 @@ class CustomLogger:
               f'{result.statistics.total} executed,'
               f'{self._create_trace(Trace(color=Color.green.value, text=result.statistics.passed))} passed,'
               f'{self._create_trace(Trace(color=Color.red.value, text=result.statistics.failed))} failed,'
-              f'{result.statistics.skipped} skipped\n'
-              f'Suite result: {self._create_trace(Trace(color=color.value, text=result.status))}')
+              f' {result.statistics.skipped} skipped\n'
+              f'Suite result:{self._create_trace(Trace(color=color.value, text=result.status))}')
 
     def test_start(self, data, result) -> None:
         self.keyword_lvl = 0
@@ -67,4 +68,4 @@ class CustomLogger:
         trace = ''
         for item in msg:
             trace += f'{str(item)} ' if item else str(item)
-        return f'{trace}{Color.reset.value}'
+        return trace + TextFormat.clear.value
