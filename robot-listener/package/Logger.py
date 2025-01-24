@@ -51,7 +51,8 @@ class Logger:
     def keyword_start(self, data, implementation, result) -> None:
         if 'NOT RUN' not in result.status:
             prefix = f'{self._create_trace(Trace(label=Label.call.value))} ' if self.prev_kw_lvl < self.curr_kw_lvl else '  '
-            print((self.curr_kw_lvl * '\t' + prefix if self.curr_kw_lvl else '') + f'{self._create_trace(self.trace_builder.build_trace(data, implementation))}')
+            print((self.curr_kw_lvl * '\t' + prefix if self.curr_kw_lvl else '') + \
+                  f'{self._create_trace(self.trace_builder.build_trace(data, implementation))}', end='\n' if self._add_new_line(data) else ' ')
             self.prev_kw_lvl = self.curr_kw_lvl
             self.curr_kw_lvl += 1
 
@@ -60,7 +61,8 @@ class Logger:
             self.curr_kw_lvl -= 1
             label = Label.success.value if 'PASS' in result.status  else Label.fail.value
             message = ': ' + result.message if result.message else ''
-            print(self.curr_kw_lvl * '\t' + ('  ' if self.curr_kw_lvl else '') + f'{self._create_trace(Trace(label=label, text=data.name))}{message}')
+            print(self.curr_kw_lvl * '\t' + ('  ' if self.curr_kw_lvl else '') + \
+                  f'{self._create_trace(Trace(label=label, text=data.name))}{message}')
         
     def compute_time_elapsed(self, start_time, end_time) -> float:
         time_format = "%Y%m%d %H:%M:%S.%f"
@@ -72,3 +74,6 @@ class Logger:
         for item in msg:
             trace += f'{str(item)} ' if item != '' else ''
         return trace[:-1] + TextFormat.clear.value
+    
+    def _add_new_line(self, data):
+        return True if data.name != "Log To Console" else False

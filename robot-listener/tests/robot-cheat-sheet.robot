@@ -31,6 +31,7 @@ A keyword without arguments
 A keyword with a required argument
     [Arguments]    ${argument}
     Sleep    3s
+    Log To Console    A log in the console of numer ${NUMBER}
     Log    Required argument: ${argument}
 
 A keyword with an optional argument

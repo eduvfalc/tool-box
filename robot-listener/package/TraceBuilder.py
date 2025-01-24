@@ -32,7 +32,9 @@ class TraceBuilder:
             
     def _add_text(self, data, implementation):
         match data.name:
-            case _ if "Log" in data.name:
+            case _ if data.name == "Log":
                 return self.built_in.replace_variables(data.args[0])
+            case _ if data.name == "Log To Console" :
+                return ''
             case _:
                 return data.name
