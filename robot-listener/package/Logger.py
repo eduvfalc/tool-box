@@ -4,15 +4,21 @@ from TraceBuilder import TraceBuilder
 from datetime import datetime
 from shutil import get_terminal_size
 
+end_keyword_blacklist = [
+    "Log To Console",
+    "Log",
+    "Sleep"
+]
+
 class Logger:
     def __init__(self):
         self.trace_builder = TraceBuilder()
-        print(f'{self._create_trace(Trace(text="Robot Framework Pretty Logger"))}\n'
-              f'{self._create_trace(Trace(text="Legend:"))} '
-              f'{self._create_trace(Trace(label=Label.success.value, text="Pass"))} '
-              f'{self._create_trace(Trace(label=Label.fail.value, text="Fail"))} '
-              f'{self._create_trace(Trace(label=Label.busy.value, text="Running"))} '
-              f'{self._create_trace(Trace(label=Label.call.value, text="Nested call"))}')
+        print(f'{self._trace_to_str(Trace(text="Robot Framework Pretty Logger"))}\n'
+              f'{self._trace_to_str(Trace(text="Legend:"))} '
+              f'{self._trace_to_str(Trace(label=Label.success.value, text="Pass"))} '
+              f'{self._trace_to_str(Trace(label=Label.fail.value, text="Fail"))} '
+              f'{self._trace_to_str(Trace(label=Label.busy.value, text="Running"))} '
+              f'{self._trace_to_str(Trace(label=Label.call.value, text="Nested call"))}')
 
     def suite_start(self, data, result) -> None:
         docs = data.doc.replace("\n", " ")
@@ -25,10 +31,10 @@ class Logger:
         print('=' * get_terminal_size().columns)
         print(f'Test suite finished in {elapsed_time} seconds\n'
               f'{result.statistics.total} executed,'
-              f'{self._create_trace(Trace(color=Color.green.value, text=result.statistics.passed))} passed,'
-              f'{self._create_trace(Trace(color=Color.red.value, text=result.statistics.failed))} failed,'
+              f'{self._trace_to_str(Trace(color=Color.green.value, text=result.statistics.passed))} passed,'
+              f'{self._trace_to_str(Trace(color=Color.red.value, text=result.statistics.failed))} failed,'
               f' {result.statistics.skipped} skipped\n'
-              f'Suite result: {self._create_trace(Trace(color=color.value, text=result.status))}')
+              f'Suite result: {self._trace_to_str(Trace(color=color.value, text=result.status))}')
 
     def test_start(self, data, result) -> None:
         # to control the log indent for nested keyword calls
@@ -46,30 +52,31 @@ class Logger:
         print('-' * terminal_size.columns)
         color = Color.green if 'PASS' in result.status else Color.red
         print(f'Test case finished in {self.compute_time_elapsed(result.starttime, result.endtime)} seconds\n'
-              f'Test result: {self._create_trace(Trace(color=color.value, text=result.status))}')
+              f'Test result: {self._trace_to_str(Trace(color=color.value, text=result.status))}')
 
     def keyword_start(self, data, implementation, result) -> None:
         if 'NOT RUN' not in result.status:
-            prefix = f'{self._create_trace(Trace(label=Label.call.value))} ' if self.prev_kw_lvl < self.curr_kw_lvl else '  '
+            prefix = f'{self._trace_to_str(Trace(label=Label.call.value))} ' if self.prev_kw_lvl < self.curr_kw_lvl else '  '
             print((self.curr_kw_lvl * '\t' + prefix if self.curr_kw_lvl else '') + \
-                  f'{self._create_trace(self.trace_builder.build_trace(data, implementation))}', end='\n' if self._add_new_line(data) else ' ')
+                  f'{self._trace_to_str(self.trace_builder.build_trace(data, implementation))}', end='\n' if self._add_new_line(data) else ' ')
             self.prev_kw_lvl = self.curr_kw_lvl
             self.curr_kw_lvl += 1
 
     def keyword_end(self, data, implementation, result) -> None:
         if 'NOT RUN' not in result.status:
             self.curr_kw_lvl -= 1
-            label = Label.success.value if 'PASS' in result.status  else Label.fail.value
-            message = ': ' + result.message if result.message else ''
-            print(self.curr_kw_lvl * '\t' + ('  ' if self.curr_kw_lvl else '') + \
-                  f'{self._create_trace(Trace(label=label, text=data.name))}{message}')
+            if data.name not in end_keyword_blacklist:
+                label = Label.success.value if 'PASS' in result.status  else Label.fail.value
+                message = ': ' + result.message if result.message else ''
+                print(self.curr_kw_lvl * '\t' + ('  ' if self.curr_kw_lvl else '') + \
+                    f'{self._trace_to_str(Trace(label=label, text=data.name))}{message}')
         
     def compute_time_elapsed(self, start_time, end_time) -> float:
         time_format = "%Y%m%d %H:%M:%S.%f"
         elapsed_time = datetime.strptime(end_time, time_format) - datetime.strptime(start_time, time_format)
         return elapsed_time.total_seconds()
 
-    def _create_trace(self, msg: Trace) -> str:
+    def _trace_to_str(self, msg: Trace) -> str:
         trace = ''
         for item in msg:
             trace += f'{str(item)} ' if item != '' else ''
