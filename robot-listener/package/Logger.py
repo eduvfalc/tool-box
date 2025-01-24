@@ -6,9 +6,6 @@ from shutil import get_terminal_size
 
 class Logger:
     def __init__(self):
-        # to control the log indent for nested keyword calls
-        self.curr_kw_lvl = 0
-        self.prev_kw_lvl = 0
         self.trace_builder = TraceBuilder()
         print(f'{self._create_trace(Trace(text="Robot Framework Pretty Logger"))}\n'
               f'{self._create_trace(Trace(text="Legend:"))} '
@@ -34,7 +31,9 @@ class Logger:
               f'Suite result: {self._create_trace(Trace(color=color.value, text=result.status))}')
 
     def test_start(self, data, result) -> None:
+        # to control the log indent for nested keyword calls
         self.curr_kw_lvl = 0
+        self.prev_kw_lvl = 0
         terminal_size = get_terminal_size()
         docs = data.doc.replace("\n", " ")
         print('=' * terminal_size.columns)
