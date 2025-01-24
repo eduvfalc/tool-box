@@ -3,4 +3,4 @@
 robot --console quiet \
       --listener $(pwd)/package/Listener.py \
       --outputdir ./out/test-run/ \
-      ./tests/robot-cheat-sheet.robot
+      ./tests/test.robot

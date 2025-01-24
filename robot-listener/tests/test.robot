@@ -21,7 +21,10 @@ Call keywords with a varying number of arguments
     A keyword with any number of arguments
     A keyword with any number of arguments    arg1    arg2    arg3    arg4    arg5
     A keyword with one or more arguments    arg1
-    A keyword with one or more arguments    arg1    arg2    arg3
+    A keyword with one or more arguments    arg1    arg2    arg
+    Comment    Test comment
+    ${result}=    Convert To Binary    10
+    Log    Result is ${result}
 
 *** Keywords ***
 A keyword without arguments
@@ -30,7 +33,6 @@ A keyword without arguments
 
 A keyword with a required argument
     [Arguments]    ${argument}
-    Sleep    3s
     Log To Console    A log in the console of numer ${NUMBER}
     Log    Required argument: ${argument}
 
