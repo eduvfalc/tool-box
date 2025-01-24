@@ -16,7 +16,7 @@ Call keywords with a varying number of arguments
     A keyword with a required argument    ${10}
     A keyword with a required argument    Argument
     A keyword with an optional argument
-    A keyword with an optional argument    Argument
+    A keyword with an optional argument    ${NUMBER}
     A keyword with an optional argument    argument=Argument
     A keyword with any number of arguments
     A keyword with any number of arguments    arg1    arg2    arg3    arg4    arg5

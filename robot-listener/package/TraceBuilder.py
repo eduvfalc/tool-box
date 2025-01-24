@@ -8,8 +8,8 @@ class TraceBuilder:
     def build_trace(self, data, implementation):
         return Trace(label=self._add_label(data), \
                      color=self._add_color(data), \
-                     text_format=self._add_text_format(data), \
-                     text=self._add_text(data, implementation))
+                     text=self._add_text(data, implementation), \
+                     text_format=self._add_text_format(data))
 
     def _add_label(self, data):
         match data.name:
