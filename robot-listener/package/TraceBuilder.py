@@ -34,7 +34,9 @@ class TraceBuilder:
         match data.name:
             case _ if data.name == "Log":
                 return self.built_in.replace_variables(data.args[0])
-            case _ if data.name == "Log To Console" :
+            case _ if data.name == "Log To Console":
                 return ''
+            case _ if data.name == "Sleep":
+                return f'{data.name} {data.args[0]}'
             case _:
                 return data.name
