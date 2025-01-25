@@ -21,7 +21,7 @@ Call keywords with a varying number of arguments
     A keyword with any number of arguments
     A keyword with any number of arguments    arg1    arg2    arg3    arg4    arg5
     A keyword with one or more arguments    arg1
-    A keyword with one or more arguments    arg1    arg2    arg
+    A keyword with one or more arguments    arg1    arg2    @{LIST}
     Comment    Test comment
     ${result}=    Convert To Binary    10
     Log    Result is ${result}

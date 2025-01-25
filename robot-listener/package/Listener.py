@@ -3,9 +3,7 @@ from Logger import Logger
 from TraceTypes import *
 import shutil
 import json
-
-# path to out folder
-PATH_TO_OUTPUT = "../out/"
+from Constants import PATH_TO_OUTPUT
 
 class Listener:
     ROBOT_LISTENER_API_VERSION = 3

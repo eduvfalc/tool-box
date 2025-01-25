@@ -1,6 +1,6 @@
 from TraceTypes import *
 from TraceBuilder import TraceBuilder
-from Blacklist import start_keyword_blacklist, end_keyword_blacklist
+from Constants import skip_at_start_keyword_list, skip_at_end_keyword_list, skip_newline_list
 
 from datetime import datetime
 from shutil import get_terminal_size
@@ -21,7 +21,7 @@ class Logger:
         print(f'Test suite: {data.name}\nDocumentation: {docs}')
 
     def suite_end(self, data, result) -> None:
-        elapsed_time = self.compute_time_elapsed(result.starttime, result.endtime)
+        elapsed_time = self._compute_time_elapsed(result.starttime, result.endtime)
         color = Color.green if 'PASS' in result.status else Color.red
         print('=' * get_terminal_size().columns)
         print(f'Test suite finished in {elapsed_time} seconds\n'
@@ -46,12 +46,12 @@ class Logger:
         terminal_size = get_terminal_size()
         print('-' * terminal_size.columns)
         color = Color.green if 'PASS' in result.status else Color.red
-        print(f'Test case finished in {self.compute_time_elapsed(result.starttime, result.endtime)} seconds\n'
+        print(f'Test case finished in {self._compute_time_elapsed(result.starttime, result.endtime)} seconds\n'
               f'Test result: {self._trace_to_str(Trace(color=color.value, text=result.status))}')
 
     def keyword_start(self, data, implementation, result) -> None:
         if 'NOT RUN' not in result.status:
-            if data.name not in start_keyword_blacklist:
+            if data.name not in skip_at_start_keyword_list:
                 prefix = f'{self._trace_to_str(Trace(label=Label.call.value))} ' if self.prev_kw_lvl < self.curr_kw_lvl else '  '
                 print((self.curr_kw_lvl * '\t' + prefix if self.curr_kw_lvl else '') + \
                         f'{self._trace_to_str(self.trace_builder.build_trace(data, implementation))}', \
@@ -62,13 +62,13 @@ class Logger:
     def keyword_end(self, data, implementation, result) -> None:
         if 'NOT RUN' not in result.status:
             self.curr_kw_lvl -= 1
-            if data.name not in end_keyword_blacklist:
+            if data.name not in skip_at_end_keyword_list:
                 label = Label.success.value if 'PASS' in result.status  else Label.fail.value
                 message = ': ' + result.message if result.message else ''
                 print(self.curr_kw_lvl * '\t' + ('  ' if self.curr_kw_lvl else '') + \
                         f'{self._trace_to_str(Trace(label=label, text=data.name))}{message}')
         
-    def compute_time_elapsed(self, start_time, end_time) -> float:
+    def _compute_time_elapsed(self, start_time, end_time) -> float:
         time_format = "%Y%m%d %H:%M:%S.%f"
         elapsed_time = datetime.strptime(end_time, time_format) - datetime.strptime(start_time, time_format)
         return elapsed_time.total_seconds()
@@ -80,4 +80,4 @@ class Logger:
         return trace[:-1] + TextFormat.clear.value
     
     def _add_new_line(self, data):
-        return True if data.name != "Log To Console" else False
+        return True if data.name not in skip_newline_list else False
