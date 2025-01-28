@@ -1,6 +1,6 @@
-from TraceTypes import *
+from TraceTypes import Color, TextFormat, Label, Trace
 from TraceBuilder import TraceBuilder
-from Constants import skip_at_start_keyword_list, skip_at_end_keyword_list, skip_newline_list
+from Constants import start_keyword_skip_list, end_keyword_skip_list, newline_skip_list
 
 from datetime import datetime
 from shutil import get_terminal_size
@@ -8,12 +8,7 @@ from shutil import get_terminal_size
 class Logger:
     def __init__(self):
         self.trace_builder = TraceBuilder()
-        print(f'{self._trace_to_str(Trace(text="Robot Framework Pretty Logger"))}\n'
-              f'{self._trace_to_str(Trace(text="Legend:"))} '
-              f'{self._trace_to_str(Trace(label=Label.success.value, text="Pass"))} '
-              f'{self._trace_to_str(Trace(label=Label.fail.value, text="Fail"))} '
-              f'{self._trace_to_str(Trace(label=Label.busy.value, text="Running"))} '
-              f'{self._trace_to_str(Trace(label=Label.call.value, text="Nested call"))}')
+        self._print_legend()
 
     def suite_start(self, data, result) -> None:
         docs = data.doc.replace("\n", " ")
@@ -51,22 +46,22 @@ class Logger:
 
     def keyword_start(self, data, implementation, result) -> None:
         if 'NOT RUN' not in result.status:
-            if data.name not in skip_at_start_keyword_list:
+            if data.name not in start_keyword_skip_list:
                 prefix = f'{self._trace_to_str(Trace(label=Label.call.value))} ' if self.prev_kw_lvl < self.curr_kw_lvl else '  '
-                print((self.curr_kw_lvl * '\t' + prefix if self.curr_kw_lvl else '') + \
-                        f'{self._trace_to_str(self.trace_builder.build_trace(data, implementation))}', \
-                             end='\n' if self._add_new_line(data) else ' ')
+                print((self.curr_kw_lvl * '\t' + prefix if self.curr_kw_lvl else '') +
+                      f'{self._trace_to_str(self.trace_builder.build_trace(data, implementation))}',
+                      end='\n' if self._add_new_line(data) else ' ')
                 self.prev_kw_lvl = self.curr_kw_lvl
             self.curr_kw_lvl += 1
 
     def keyword_end(self, data, implementation, result) -> None:
         if 'NOT RUN' not in result.status:
             self.curr_kw_lvl -= 1
-            if data.name not in skip_at_end_keyword_list:
+            if data.name not in end_keyword_skip_list:
                 label = Label.success.value if 'PASS' in result.status  else Label.fail.value
                 message = ': ' + result.message if result.message else ''
-                print(self.curr_kw_lvl * '\t' + ('  ' if self.curr_kw_lvl else '') + \
-                        f'{self._trace_to_str(Trace(label=label, text=data.name))}{message}')
+                print(self.curr_kw_lvl * '\t' + ('  ' if self.curr_kw_lvl else '') +
+                      f'{self._trace_to_str(Trace(label=label, text=data.name))}{message}')
         
     def _compute_time_elapsed(self, start_time, end_time) -> float:
         time_format = "%Y%m%d %H:%M:%S.%f"
@@ -79,5 +74,13 @@ class Logger:
             trace += f'{str(item)} ' if item != '' else ''
         return trace[:-1] + TextFormat.clear.value
     
-    def _add_new_line(self, data):
-        return True if data.name not in skip_newline_list else False
+    def _add_new_line(self, data) -> bool:
+        return data.name not in newline_skip_list
+    
+    def _print_legend(self) -> None:
+        print(f'{self._trace_to_str(Trace(text="Robot Framework Pretty Logger"))}\n'
+              f'{self._trace_to_str(Trace(text="Legend:"))} '
+              f'{self._trace_to_str(Trace(label=Label.success.value, text="Pass"))} '
+              f'{self._trace_to_str(Trace(label=Label.fail.value, text="Fail"))} '
+              f'{self._trace_to_str(Trace(label=Label.busy.value, text="Running"))} '
+              f'{self._trace_to_str(Trace(label=Label.call.value, text="Nested call"))}')

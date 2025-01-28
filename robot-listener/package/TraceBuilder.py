@@ -1,4 +1,4 @@
-from TraceTypes import *
+from TraceTypes import Label, Trace
 from robot.libraries.BuiltIn import BuiltIn
 
 class TraceBuilder:
@@ -21,11 +21,13 @@ class TraceBuilder:
                 return Label.busy.value
 
     def _add_color(self, data):
+        # TODO: add color for different keywords
         match data.name:
             case _:
                 return ''
     
     def _add_text_format(self, data):
+        # TODO: add text format for different keywords
         match data.name:
             case _:
                 return ''
@@ -36,6 +38,8 @@ class TraceBuilder:
                 return self.built_in.replace_variables(data.args[0])
             case _ if data.name == "Log To Console":
                 return ''
+            case _ if data.name == "Log Many":
+                return self.built_in.replace_variables(data.args[0])
             case _ if data.name == "Sleep":
                 return f'{data.name} {data.args[0]}'
             case _:
