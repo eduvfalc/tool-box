@@ -30,27 +30,30 @@ class Logger:
         # to control the log indent for nested keyword calls
         self.curr_kw_lvl = 0
         self.prev_kw_lvl = 0
-        terminal_size = get_terminal_size()
         docs = data.doc.replace("\n", " ")
+        terminal_size = get_terminal_size()
         print('=' * terminal_size.columns)
-        print(f'Test case: {data.name}\n'
-              f'Documentation: {docs}')
+        print(f'Test case: {data.name}\nDocumentation: {docs}')
         print('-' * terminal_size.columns)
 
     def test_end(self, data, result) -> None:
+        color = Color.green if 'PASS' in result.status else Color.red
+        time_elapsed = self._compute_time_elapsed(result.starttime, result.endtime)
+        trace = self._trace_to_str(Trace(color=color.value, text=result.status))
         terminal_size = get_terminal_size()
         print('-' * terminal_size.columns)
-        color = Color.green if 'PASS' in result.status else Color.red
-        print(f'Test case finished in {self._compute_time_elapsed(result.starttime, result.endtime)} seconds\n'
-              f'Test result: {self._trace_to_str(Trace(color=color.value, text=result.status))}')
+        print(f'Test case finished in {time_elapsed} seconds\nTest result: {trace}')
 
     def keyword_start(self, data, implementation, result) -> None:
         if 'NOT RUN' not in result.status:
             if data.name not in start_keyword_skip_list:
-                prefix = f'{self._trace_to_str(Trace(label=Label.call.value))} ' if self.prev_kw_lvl < self.curr_kw_lvl else '  '
-                print((self.curr_kw_lvl * '\t' + prefix if self.curr_kw_lvl else '') +
-                      f'{self._trace_to_str(self.trace_builder.build_trace(data, implementation))}',
-                      end='\n' if self._add_new_line(data) else ' ')
+                # print forwarded call label if the keyword is nested, else adjust indent
+                label = f'{self._trace_to_str(Trace(label=Label.call.value))} ' if self.prev_kw_lvl < self.curr_kw_lvl else '  '
+                indent = self.curr_kw_lvl * '\t'
+                trace = self._trace_to_str(self.trace_builder.build_trace(data, implementation))
+                terminator = '\n' if self._add_new_line(data) else ' '
+                # if not in root keyword level, don't indent
+                print((indent + label if self.curr_kw_lvl else '') + trace, end=terminator)
                 self.prev_kw_lvl = self.curr_kw_lvl
             self.curr_kw_lvl += 1
 
@@ -59,9 +62,12 @@ class Logger:
             self.curr_kw_lvl -= 1
             if data.name not in end_keyword_skip_list:
                 label = Label.success.value if 'PASS' in result.status  else Label.fail.value
-                message = ': ' + result.message if result.message else ''
-                print(self.curr_kw_lvl * '\t' + ('  ' if self.curr_kw_lvl else '') +
-                      f'{self._trace_to_str(Trace(label=label, text=data.name))}{message}')
+                indent = self.curr_kw_lvl * '\t'
+                tab = '  ' if self.curr_kw_lvl else ''
+                trace = self._trace_to_str(Trace(label=label, text=data.name))
+                msg = ': ' + result.message if result.message else ''
+                msg = self._trace_to_str(Trace(color=Color.red.value, text=msg))
+                print(indent + tab + trace + msg)
         
     def _compute_time_elapsed(self, start_time, end_time) -> float:
         time_format = "%Y%m%d %H:%M:%S.%f"
