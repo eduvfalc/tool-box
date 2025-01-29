@@ -28,3 +28,7 @@ class Label(Enum):
 class Trace(namedtuple('Trace', ['label', 'color', 'text', 'text_format'])):
     def __new__(cls, label='', color='', text='', text_format=''):
         return super().__new__(cls, label, color, text, text_format)
+    
+    def to_str(self):
+        trace = ' '.join(str(item) for item in self if item != '')
+        return trace + TextFormat.clear.value
