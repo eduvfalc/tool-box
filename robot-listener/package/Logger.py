@@ -51,7 +51,7 @@ class Logger:
                 label = f'{Trace(label=Label.call.value).to_str()} ' if self.prev_kw_lvl < self.curr_kw_lvl else '  '
                 indent = self.curr_kw_lvl * '\t'
                 trace = self.trace_builder.build_trace(data, implementation).to_str()
-                terminator = '\n' if self._add_new_line(data) else ' '
+                terminator = '\n' if data.name not in newline_skip_list else ' '
                 # if not in root keyword level, don't indent
                 print((indent + label if self.curr_kw_lvl else '') + trace, end=terminator)
                 self.prev_kw_lvl = self.curr_kw_lvl
@@ -73,9 +73,6 @@ class Logger:
         time_format = "%Y%m%d %H:%M:%S.%f"
         elapsed_time = datetime.strptime(end_time, time_format) - datetime.strptime(start_time, time_format)
         return elapsed_time.total_seconds()
-    
-    def _add_new_line(self, data) -> bool:
-        return data.name not in newline_skip_list
     
     def _print_legend(self) -> None:
         print(f'{Trace(text="Robot Framework Pretty Logger").to_str()}\n'
