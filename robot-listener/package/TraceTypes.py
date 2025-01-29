@@ -14,7 +14,7 @@ class TextFormat(Enum):
     bold   = "\033[1m"
     italic = "\033[3m"
 
-# modify these labels to match your style/meet terminal constraints
+# Modify these labels to match your style/meet terminal constraints
 class Label(Enum):
     success = '✅'
     fail = '❌'

@@ -45,29 +45,27 @@ class Logger:
         print(f'Test case finished in {time_elapsed} seconds\nTest result: {trace}')
 
     def keyword_start(self, data, implementation, result) -> None:
-        if 'NOT RUN' not in result.status:
-            if data.name not in start_keyword_skip_list:
-                # print forwarded call label if the keyword is nested, else adjust indent
-                label = f'{Trace(label=Label.call.value).to_str()} ' if self.prev_kw_lvl < self.curr_kw_lvl else '  '
-                indent = self.curr_kw_lvl * '\t'
-                trace = self.trace_builder.build_trace(data, implementation).to_str()
-                terminator = '\n' if data.name not in newline_skip_list else ' '
-                # if not in root keyword level, don't indent
-                print((indent + label if self.curr_kw_lvl else '') + trace, end=terminator)
-                self.prev_kw_lvl = self.curr_kw_lvl
-            self.curr_kw_lvl += 1
+        if 'NOT RUN' not in result.status and data.name not in start_keyword_skip_list:
+            # print forwarded call label if the keyword is nested, else adjust indent
+            label = f'{Trace(label=Label.call.value).to_str()} ' if self.prev_kw_lvl < self.curr_kw_lvl else '  '
+            indent = self.curr_kw_lvl * '\t'
+            trace = self.trace_builder.build_trace(data, implementation).to_str()
+            terminator = '\n' if data.name not in newline_skip_list else ' '
+            # if not in root keyword level, don't indent
+            print((indent + label if self.curr_kw_lvl else '') + trace, end=terminator)
+            self.prev_kw_lvl = self.curr_kw_lvl
+        self.curr_kw_lvl += 1
 
     def keyword_end(self, data, implementation, result) -> None:
-        if 'NOT RUN' not in result.status:
-            self.curr_kw_lvl -= 1
-            if data.name not in end_keyword_skip_list:
-                label = Label.success.value if 'PASS' in result.status  else Label.fail.value
-                indent = self.curr_kw_lvl * '\t'
-                tab = '  ' if self.curr_kw_lvl else ''
-                trace = Trace(label=label, text=data.name).to_str()
-                msg = ': ' + result.message if result.message else ''
-                msg = Trace(color=Color.red.value, text=msg).to_str()
-                print(indent + tab + trace + msg)
+        self.curr_kw_lvl -= 1
+        if 'NOT RUN' not in result.status and data.name not in end_keyword_skip_list:
+            label = Label.success.value if 'PASS' in result.status  else Label.fail.value
+            indent = self.curr_kw_lvl * '\t'
+            tab = '  ' if self.curr_kw_lvl else ''
+            trace = Trace(label=label, text=data.name).to_str()
+            msg = ': ' + result.message if result.message else ''
+            msg = Trace(color=Color.red.value, text=msg).to_str()
+            print(indent + tab + trace + msg)
         
     def _compute_time_elapsed(self, start_time, end_time) -> float:
         time_format = "%Y%m%d %H:%M:%S.%f"
