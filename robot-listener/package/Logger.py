@@ -1,21 +1,25 @@
-from TraceTypes import Color, TextFormat, Label, Trace
-from TraceBuilder import TraceBuilder
-from Constants import start_keyword_skip_list, end_keyword_skip_list, newline_skip_list
-
-from datetime import datetime
 from shutil import get_terminal_size
+from datetime import datetime
+from typing import Union
+
+from Constants import start_keyword_skip_list, end_keyword_skip_list, newline_skip_list
+from TraceTypes import Color, Label, Trace
+from TraceBuilder import TraceBuilder
+
+from robot.running import TestSuite as TestSuiteData, TestCase as TestCaseData, Keyword as KeywordData, LibraryKeyword, UserKeyword
+from robot.result import TestSuite as TestSuiteResult, TestCase as TestCaseResult, Keyword as KeywordResult
 
 class Logger:
     def __init__(self):
         self.trace_builder = TraceBuilder()
         self._print_legend()
 
-    def suite_start(self, data, result) -> None:
+    def suite_start(self, data: TestSuiteData, result: TestSuiteResult) -> None:
         docs = data.doc.replace("\n", " ")
         print('=' * get_terminal_size().columns)
         print(f'Test suite: {data.name}\nDocumentation: {docs}')
 
-    def suite_end(self, data, result) -> None:
+    def suite_end(self, data: TestSuiteData, result: TestSuiteResult) -> None:
         elapsed_time = self._compute_time_elapsed(result.starttime, result.endtime)
         color = Color.green if 'PASS' in result.status else Color.red
         print('=' * get_terminal_size().columns)
@@ -23,10 +27,10 @@ class Logger:
               f'{result.statistics.total} executed,'
               f'{Trace(color=Color.green.value, text=result.statistics.passed).to_str()} passed,'
               f'{Trace(color=Color.red.value, text=result.statistics.failed).to_str()} failed,'
-              f' {result.statistics.skipped} skipped\n'
+              f'{result.statistics.skipped} skipped\n'
               f'Suite result: {Trace(color=color.value, text=result.status).to_str()}')
 
-    def test_start(self, data, result) -> None:
+    def test_start(self, data: TestCaseData, result: TestCaseResult) -> None:
         # to control the log indent for nested keyword calls
         self.curr_kw_lvl = 0
         self.prev_kw_lvl = 0
@@ -36,7 +40,7 @@ class Logger:
         print(f'Test case: {data.name}\nDocumentation: {docs}')
         print('-' * terminal_size.columns)
 
-    def test_end(self, data, result) -> None:
+    def test_end(self, data: TestCaseData, result: TestCaseResult) -> None:
         color = Color.green if 'PASS' in result.status else Color.red
         time_elapsed = self._compute_time_elapsed(result.starttime, result.endtime)
         trace = Trace(color=color.value, text=result.status).to_str()
@@ -44,7 +48,7 @@ class Logger:
         print('-' * terminal_size.columns)
         print(f'Test case finished in {time_elapsed} seconds\nTest result: {trace}')
 
-    def keyword_start(self, data, implementation, result) -> None:
+    def keyword_start(self, data: KeywordData, implementation: Union[UserKeyword, LibraryKeyword], result: KeywordResult) -> None:
         if 'NOT RUN' not in result.status and data.name not in start_keyword_skip_list:
             # print forwarded call label if the keyword is nested, else adjust indent
             label = f'{Trace(label=Label.call.value).to_str()} ' if self.prev_kw_lvl < self.curr_kw_lvl else '  '
@@ -56,7 +60,7 @@ class Logger:
             self.prev_kw_lvl = self.curr_kw_lvl
         self.curr_kw_lvl += 1
 
-    def keyword_end(self, data, implementation, result) -> None:
+    def keyword_end(self, data: KeywordData, implementation: Union[UserKeyword, LibraryKeyword], result: KeywordResult) -> None:
         self.curr_kw_lvl -= 1
         if 'NOT RUN' not in result.status and data.name not in end_keyword_skip_list:
             label = Label.success.value if 'PASS' in result.status  else Label.fail.value
